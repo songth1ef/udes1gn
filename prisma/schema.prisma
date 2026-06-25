@@ -1,0 +1,116 @@
+// UDES1GN 友定 — Prisma schema
+// 严格对齐 docs/implementation.md §3。
+// 界面文案走 Locale/Translation（DB 驱动 + 后台可管理）；用户内容首版单语存储。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ProposalStatus {
+  COLLECTING
+  ADOPTED
+  IN_PROGRESS
+  SHIPPED
+  REJECTED
+}
+
+enum ReportTarget {
+  PROPOSAL
+  COMMENT
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  displayName  String
+  role         Role       @default(USER)
+  bannedAt     DateTime?
+  createdAt    DateTime   @default(now())
+  proposals    Proposal[]
+  votes        Vote[]
+  comments     Comment[]
+  reports      Report[]
+}
+
+model Proposal {
+  id        String         @id @default(cuid())
+  authorId  String
+  author    User           @relation(fields: [authorId], references: [id])
+  title     String
+  body      String
+  category  String
+  status    ProposalStatus @default(COLLECTING)
+  hiddenAt  DateTime?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  votes     Vote[]
+  comments  Comment[]
+
+  @@index([status])
+}
+
+model Vote {
+  id         String   @id @default(cuid())
+  proposalId String
+  proposal   Proposal @relation(fields: [proposalId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@unique([proposalId, userId]) // 1 人 1 票
+}
+
+model Comment {
+  id         String    @id @default(cuid())
+  proposalId String
+  proposal   Proposal  @relation(fields: [proposalId], references: [id])
+  authorId   String
+  author     User      @relation(fields: [authorId], references: [id])
+  body       String
+  hiddenAt   DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  targetType ReportTarget
+  targetId   String
+  reporterId String
+  reporter   User         @relation(fields: [reporterId], references: [id])
+  reason     String
+  resolvedAt DateTime?
+  createdAt  DateTime     @default(now())
+}
+
+// ── i18n：DB 驱动、后台可管理、任意语言可扩展 ──────────────
+model Locale {
+  code      String   @id // BCP-47：'zh' / 'en' / 'zh-HK' / 未来任意
+  name      String // 显示名："中文" / "English"
+  enabled   Boolean  @default(true) // 后台开关，控制前台是否可选
+  isDefault Boolean  @default(false) // 兜底语言（缺翻译时回退到它）
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Translation {
+  id         String   @id @default(cuid())
+  namespace  String // 'common' / 'nav' / 'auth' / 'proposal' ...
+  key        String // 'submit'
+  localeCode String // 关联 Locale.code
+  value      String
+  updatedAt  DateTime @updatedAt
+
+  @@unique([namespace, key, localeCode])
+  @@index([localeCode])
+}

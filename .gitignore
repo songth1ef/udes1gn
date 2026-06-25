@@ -38,3 +38,9 @@ yarn-error.log*
 
 # docker
 docker-compose.override.yml
+
+# playwright（保留 e2e/screenshots 作为交付物，忽略运行期产物）
+/test-results/
+/playwright-report/
+/blob-report/
+/e2e/.report/
