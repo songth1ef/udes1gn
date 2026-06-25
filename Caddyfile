@@ -1,0 +1,5 @@
+# 域名从 compose 注入的环境变量读取，无需改文件
+{$SITE_DOMAIN} {
+	reverse_proxy app:3000
+	encode gzip zstd
+}

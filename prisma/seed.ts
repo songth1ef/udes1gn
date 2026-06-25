@@ -268,13 +268,16 @@ const PROPOSALS = [
 ];
 
 async function main() {
-  // ① admin 用户
-  const passwordHash = await bcrypt.hash('admin12345', 10);
+  // ① admin 用户（凭证从 env 读；缺省值仅用于本地 dev，生产务必设 ADMIN_EMAIL/ADMIN_PASSWORD）
+  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@udes1gn.local').toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin12345';
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@udes1gn.local' },
-    update: { passwordHash, displayName: 'Admin', role: 'ADMIN' },
+    where: { email: adminEmail },
+    // 不重置已存在管理员的密码（避免重跑 seed 把生产口令冲掉）
+    update: { displayName: 'Admin', role: 'ADMIN' },
     create: {
-      email: 'admin@udes1gn.local',
+      email: adminEmail,
       passwordHash,
       displayName: 'Admin',
       role: 'ADMIN',

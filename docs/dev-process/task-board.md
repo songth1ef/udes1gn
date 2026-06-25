@@ -94,12 +94,12 @@
 
 | ID | 任务 | 优先级 | 估时 | 状态 |
 |----|------|--------|------|------|
-| I1 | Dockerfile（standalone 多阶段） | P0 | 15m | ⬜ 遗留（未创建） |
-| I2 | docker-compose（app + postgres + caddy） | P0 | 15m | ⬜ 遗留（未创建） |
-| I3 | Caddyfile（真实域名 + 自动 HTTPS） | P0 | 5m | 🟥 待域名 |
-| I4 | GitHub Actions CI（lint + build + test） | P1 | 20m | ⬜ 遗留（未创建） |
-| I5 | CD：push → 香港服务器自动部署 | P0 | 30m | 🟥 待 SSH 访问 |
-| I6 | 首次生产部署 + migrate deploy + 验证可访问 | P0 | 20m | 🟥 待 I5 |
+| I1 | Dockerfile（standalone 多阶段 + 迁移） | P0 | 15m | ✅ |
+| I2 | docker-compose（app + postgres + caddy）+ 入口脚本 + deploy.sh | P0 | 15m | ✅ |
+| I3 | Caddyfile（域名走 env 注入 + 自动 HTTPS） | P0 | 5m | ✅（域名由 .env.production 注入） |
+| I4 | GitHub Actions CI（lint + build + test） | P1 | 20m | ⬜ 遗留（用户选 SSH 直接部署，CI 暂缓） |
+| I5 | CD：SSH 部署到香港服务器 | P0 | 30m | 🟦 物料就绪，待 SSH 执行 |
+| I6 | 首次生产部署 + migrate deploy + 验证可访问 | P0 | 20m | 🟥 待 SSH（user@host + 域名） |
 
 ## J. 文档 / 开发过程
 
