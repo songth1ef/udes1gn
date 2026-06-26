@@ -29,6 +29,14 @@ export function RegisterForm() {
   const toast = useRef<UdToastHandle>(null);
   const [pending, start] = useTransition();
   const [pwd, setPwd] = useState('');
+  const [done, setDone] = useState(false);
+
+  // 注册成功后稳定跳转登录页（让用户先看到成功 toast）
+  useEffect(() => {
+    if (!done) return;
+    const id = setTimeout(() => router.push('/login'), 900);
+    return () => clearTimeout(id);
+  }, [done, router]);
 
   // 验证码倒计时（v1 还原）
   const [countdown, setCountdown] = useState(0);
@@ -61,7 +69,7 @@ export function RegisterForm() {
       const res = await registerUser(undefined, fd);
       if (res.ok) {
         toast.current?.show('success', t('registerSuccess'));
-        setTimeout(() => router.push('/login'), 800);
+        setDone(true);
       } else if (res.fieldErrors?.email === 'email.taken') {
         toast.current?.show('error', t('emailTaken'));
       } else {
