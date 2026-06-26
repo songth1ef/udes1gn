@@ -14,10 +14,8 @@ export default async function RegisterPage({
   setRequestLocale(locale);
 
   return (
-    <section className="flex min-h-[70vh] flex-col items-center justify-center py-8">
-      <div className="w-[80vw] max-w-sm">
-        <RegisterForm />
-      </div>
+    <section className="flex min-h-[75vh] w-full items-center justify-center py-8">
+      <RegisterForm />
     </section>
   );
 }

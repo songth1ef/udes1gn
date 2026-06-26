@@ -17,10 +17,8 @@ export default async function LoginPage({
   const { callbackUrl } = await searchParams;
 
   return (
-    <section className="flex min-h-[70vh] flex-col items-center justify-center py-8">
-      <div className="w-[80vw] max-w-sm">
-        <LoginForm callbackUrl={callbackUrl} />
-      </div>
+    <section className="flex min-h-[75vh] w-full items-center justify-center py-8">
+      <LoginForm callbackUrl={callbackUrl} />
     </section>
   );
 }

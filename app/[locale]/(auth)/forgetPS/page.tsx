@@ -14,10 +14,8 @@ export default async function ForgetPasswordPage({
   setRequestLocale(locale);
 
   return (
-    <section className="flex min-h-[70vh] flex-col items-center justify-center py-8">
-      <div className="w-[80vw] max-w-sm">
-        <ForgetForm />
-      </div>
+    <section className="flex min-h-[75vh] w-full items-center justify-center py-8">
+      <ForgetForm />
     </section>
   );
 }
