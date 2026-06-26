@@ -3,10 +3,24 @@
 > 香港服务器（OpenCloudOS 9，1.9GB 内存，宝塔面板，已跑 blog）首次部署实录。
 > 2026-06-25 凌晨自动部署。
 
-## 当前状态：⚠️ 基础设施 100% 就绪，应用因一个生产期 bug 未上线
+## 当前状态：⚠️ 基础设施 + HTTPS 就绪，应用因一个生产期 bug 未上线
 
-- **`https://udes1gn.com` 当前显示**：品牌化「即将上线 / Coming soon」维护页（响应式，HTTP 200）。
+- **`https://udes1gn.com` 当前显示**：品牌化「即将上线 / Coming soon」维护页。
+- **HTTPS 已上线（2026-06-26）**：用户把 DNS 收敛为只指香港后，certbot webroot 签发 Let's Encrypt 证书成功（udes1gn.com + www，有效期至 2026-09-24），nginx 443 + http→301→https 已配置，Mac 端验证 `ssl_verify=0`（受信）。
 - **应用服务已 stop+disable**：因下述 bug 会自我请求风暴、威胁这台 1.9GB 共享机（还跑着 blog），故主动停用止血。blog 全程未受影响。
+
+## 2026-06-26 更新：bug 在干净 DNS 服务器上确认，多个修复尝试失败
+
+- **排除「本地 VPN 毒化 DNS 致误判」**：直接在服务器（干净 DNS）以 `next start` 临时端口 + fd 看门狗复测，`/zh` 仍在数秒内把 fd 冲到 3000+（看门狗杀），**循环真实存在、与 DNS 无关**。
+- **静态文案 fix 无效**：把 i18n 从「每请求查 DB」改为构建期静态 JSON（commit `b68fd94`）后，服务器上 `/zh` 仍循环。→ 根因不是 per-request DB 调用（但静态化本身是合理改进，保留）。
+- **去 `output:standalone` 无效**：仍循环。
+- **现象精确化**：生产 SSR 时 Node 用 Next 内置 RSC flight fetcher（`new URL('http://localhost:'+PORT)` + `Next-Router-Prefetch`/RSC 头 + cacheBusting）**自取自身端口**，递归爆炸。`next dev` 正常。
+- **累计已排除**：Nav/`auth()`、i18n 的 `unstable_cache`、next-intl middleware、`next/font` Inter、per-request DB 文案、`output:standalone`。
+- **结论**：这是 Next.js 15.3.4 + App Router 的生产 RSC 自取递归，非本项目业务代码可定位的单点。**正经修法**（按优先级）：
+  1. 升/降 `next` 版本（15.3.4 → 15.5.x 或 14.2.x），最可能一击解决；
+  2. 造最小复现（仅 [locale]+layout+一个页）upstream 提 issue / 验证版本；
+  3. 重构渲染：去 `generateStaticParams`（真正去掉，之前正则没匹配上）试全动态；或把 i18n provider 改为顶层静态注入。
+- **不在生产机继续 brute-force**：避免反复 fd 风暴威胁同机 blog。下一步应在隔离环境做版本矩阵测试。
 
 ## ✅ 已完成的基础设施
 

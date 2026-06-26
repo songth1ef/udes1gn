@@ -16,6 +16,7 @@ next-env.d.ts
 .env.local
 .env.*.local
 .env.production
+app.env
 
 # database
 pgdata/
