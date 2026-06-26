@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { useTranslations } from 'next-intl';
-import { Link, useRouter } from '@/lib/i18n/navigation';
+import { useLocale, useTranslations } from 'next-intl';
+import { Link } from '@/lib/i18n/navigation';
 import { UdField, type UdFieldHandle } from '@/components/UdField';
 import { UdToast, type UdToastHandle } from '@/components/UdToast';
 import { registerUser } from '@/lib/actions/auth';
@@ -20,7 +20,7 @@ const PWD_RE = /^[\w!@#$%^&*()_+={[\]:;"'<>?,./\\-]{6,32}$/;
 export function RegisterForm() {
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
-  const router = useRouter();
+  const locale = useLocale();
 
   const emailRef = useRef<UdFieldHandle>(null);
   const usernameRef = useRef<UdFieldHandle>(null);
@@ -31,12 +31,14 @@ export function RegisterForm() {
   const [pwd, setPwd] = useState('');
   const [done, setDone] = useState(false);
 
-  // 注册成功后稳定跳转登录页（让用户先看到成功 toast）
+  // 注册成功后稳定跳转登录页（window.location 兜底，必定跳转；让用户先看到成功 toast）
   useEffect(() => {
     if (!done) return;
-    const id = setTimeout(() => router.push('/login'), 900);
+    const id = setTimeout(() => {
+      window.location.href = `/${locale}/login`;
+    }, 1000);
     return () => clearTimeout(id);
-  }, [done, router]);
+  }, [done, locale]);
 
   // 验证码倒计时（v1 还原）
   const [countdown, setCountdown] = useState(0);
