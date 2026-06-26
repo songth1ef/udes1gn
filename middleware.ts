@@ -69,7 +69,11 @@ export default async function middleware(req: NextRequest) {
 
     if (!token) {
       const locale = detectLocale(pathname);
-      const loginUrl = new URL(`/${locale}/login`, req.url);
+      // 反代后 req.url 的 host 是内部 localhost:PORT，重定向 Location 会泄漏内部地址。
+      // 用转发头里的公网 host + 协议构造跳转基址。
+      const fwdHost = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
+      const base = fwdHost ? `${proto}://${fwdHost}` : req.url;
+      const loginUrl = new URL(`/${locale}/login`, base);
       loginUrl.searchParams.set('callbackUrl', pathname);
       return NextResponse.redirect(loginUrl);
     }
