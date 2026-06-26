@@ -96,10 +96,10 @@
 |----|------|--------|------|------|
 | I1 | Dockerfile（standalone 多阶段 + 迁移） | P0 | 15m | ✅ |
 | I2 | docker-compose（app + postgres + caddy）+ 入口脚本 + deploy.sh | P0 | 15m | ✅ |
-| I3 | Caddyfile（域名走 env 注入 + 自动 HTTPS） | P0 | 5m | ✅（域名由 .env.production 注入） |
-| I4 | GitHub Actions CI（lint + build + test） | P1 | 20m | ⬜ 遗留（用户选 SSH 直接部署，CI 暂缓） |
-| I5 | CD：SSH 部署到香港服务器 | P0 | 30m | 🟦 物料就绪，待 SSH 执行 |
-| I6 | 首次生产部署 + migrate deploy + 验证可访问 | P0 | 20m | 🟥 待 SSH（user@host + 域名） |
+| I3 | HTTPS（nginx 反代 + Let's Encrypt + 自动续期） | P0 | 5m | ✅ 已上线 udes1gn.com |
+| I4 | GitHub Actions CI（lint + build + test） | P1 | 20m | ⬜ 遗留（CI 暂缓，手动部署） |
+| I5 | 部署到香港服务器（native：PG+systemd+nginx，非 Docker） | P0 | 30m | ✅ |
+| I6 | 首次生产部署 + 验证可访问（含 admin 登录 E2E） | P0 | 20m | ✅ https://udes1gn.com |
 
 ## J. 文档 / 开发过程
 

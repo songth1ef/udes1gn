@@ -3,9 +3,17 @@
 > 香港服务器（OpenCloudOS 9，1.9GB 内存，宝塔面板，已跑 blog）首次部署实录。
 > 2026-06-25 凌晨自动部署。
 
-## 当前状态：⚠️ 基础设施 + HTTPS 就绪，应用因一个生产期 bug 未上线
+## 当前状态：✅ 已正式上线 `https://udes1gn.com`（2026-06-26）
 
-- **`https://udes1gn.com` 当前显示**：品牌化「即将上线 / Coming soon」维护页。
+完整应用在线：首页/提案列表·详情/发提案/投票/评论/登录注册/admin 后台/中英 i18n/响应式，全程 HTTPS（Let's Encrypt 受信证书），HTTP 自动 301→HTTPS。端到端验证：公网各路由 200、admin 登录 302→session(role=ADMIN)→/admin 200。
+
+### 🎯 根因与最终修复
+- **根因 = next-intl 3.26 × Next 15.3.4 生产不兼容**：next-intl 3 的 server 渲染在 Next 15.3.4 生产模式触发 RSC flight fetcher 自取 `localhost:PORT` 递归。**升级 next-intl → 4.x（代码零改动即兼容）后彻底解决**，所有页面秒开、fd 稳定。
+- **Prisma 引擎目标**：OpenCloudOS 运行时 OpenSSL 探测与生成目标不一致 → schema 加 `binaryTargets = ["native","debian-openssl-1.0.x","debian-openssl-3.0.x"]`。
+- **中间件跳转 host**：反代后用 `x-forwarded-host` 构造登录跳转，避免泄漏 `localhost:PORT`。
+- **证书自动续期**：crontab 每日 3:30 `certbot renew --deploy-hook 'nginx reload'`。
+
+### 历史：曾因该 bug 挂维护页（已废弃，下文为排查记录）
 - **HTTPS 已上线（2026-06-26）**：用户把 DNS 收敛为只指香港后，certbot webroot 签发 Let's Encrypt 证书成功（udes1gn.com + www，有效期至 2026-09-24），nginx 443 + http→301→https 已配置，Mac 端验证 `ssl_verify=0`（受信）。
 - **应用服务已 stop+disable**：因下述 bug 会自我请求风暴、威胁这台 1.9GB 共享机（还跑着 blog），故主动停用止血。blog 全程未受影响。
 
