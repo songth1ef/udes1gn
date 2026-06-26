@@ -26,6 +26,7 @@ export type NavLabels = {
   register: string;
   logout: string;
   menu: string;
+  settings: string;
 };
 
 export type NavUser = { name: string } | null;
@@ -38,12 +39,14 @@ export function NavShell({
   locales,
   labels,
   user,
+  showSettings = false,
 }: {
   links: NavLink[];
   tabs: NavTab[];
   locales: LocaleOption[];
   labels: NavLabels;
   user: NavUser;
+  showSettings?: boolean;
 }) {
   const pathname = usePathname();
 
@@ -87,6 +90,16 @@ export function NavShell({
 
           <div className="flex items-center gap-3">
             <LanguageSwitcher locales={locales} label={labels.language} />
+            {showSettings && (
+              <Link
+                href="/settings"
+                title={labels.settings}
+                aria-label={labels.settings}
+                className="text-lg leading-none text-foreground/70 transition-colors hover:text-ud-blue"
+              >
+                ⚙
+              </Link>
+            )}
             {user ? (
               <>
                 <span className="max-w-[12ch] truncate text-sm text-foreground/70">
