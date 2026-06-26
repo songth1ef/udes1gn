@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { auth } from '@/lib/auth';
 import { getLocales } from '@/lib/i18n/messages';
-import { NavShell, type NavLink } from './NavShell';
+import { NavShell, type NavLink, type NavTab } from './NavShell';
 
 /**
  * Nav（server）—— 顶部导航的数据装配层。
@@ -31,9 +31,19 @@ export async function Nav() {
     ...(isAdmin ? [{ href: '/admin', label: tNav('admin') }] : []),
   ];
 
+  // 移动底部 tab（v1 招牌）：首页 / 提案 / 发起 / 我的（未登录指向登录页）
+  const mineHref = user?.id ? `/user/${user.id}` : '/login';
+  const tabs: NavTab[] = [
+    { href: '/', label: tNav('home'), icon: '🏠' },
+    { href: '/proposals', label: tNav('proposals'), icon: '📋' },
+    { href: '/proposals/new', label: tNav('newProposal'), icon: '➕' },
+    { href: mineHref, label: tNav('mine'), icon: '👤' },
+  ];
+
   return (
     <NavShell
       links={links}
+      tabs={tabs}
       locales={locales.map((l) => ({ code: l.code, name: l.name }))}
       labels={{
         appName: tCommon('appName'),

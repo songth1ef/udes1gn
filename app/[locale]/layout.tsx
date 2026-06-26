@@ -33,7 +33,8 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div className="flex min-h-screen flex-col">
         <Nav />
-        <main className="mx-auto w-full max-w-main flex-1 px-4 py-6 sm:px-6 sm:py-8">
+        {/* 移动端底部留白避开 tab 栏（pb-24），桌面恢复正常 */}
+        <main className="mx-auto w-full max-w-main flex-1 px-4 pb-24 pt-6 sm:px-6 sm:py-8 md:pb-8">
           {children}
         </main>
       </div>

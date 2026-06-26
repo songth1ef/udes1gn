@@ -41,6 +41,7 @@ const TRANSLATIONS: Record<string, Record<string, { zh: string; en: string }>> =
     admin: { zh: '管理后台', en: 'Admin' },
     language: { zh: '语言', en: 'Language' },
     menu: { zh: '菜单', en: 'Menu' },
+    mine: { zh: '我的', en: 'Me' },
   },
   auth: {
     login: { zh: '登录', en: 'Log in' },
