@@ -11,6 +11,7 @@
 - **根因 = next-intl 3.26 × Next 15.3.4 生产不兼容**：next-intl 3 的 server 渲染在 Next 15.3.4 生产模式触发 RSC flight fetcher 自取 `localhost:PORT` 递归。**升级 next-intl → 4.x（代码零改动即兼容）后彻底解决**，所有页面秒开、fd 稳定。
 - **Prisma 引擎目标**：OpenCloudOS 运行时 OpenSSL 探测与生成目标不一致 → schema 加 `binaryTargets = ["native","debian-openssl-1.0.x","debian-openssl-3.0.x"]`。
 - **中间件跳转 host**：反代后用 `x-forwarded-host` 构造登录跳转，避免泄漏 `localhost:PORT`。
+- **next-intl locale 重定向 host 泄漏**（`/`→`/zh` 跳到 `https://localhost:3100/zh`）：nginx 443 `location /` 加 `proxy_redirect ~^https?://(?:localhost|127\.0\.0\.1):3100(/.*)?$ https://udes1gn.com$1;` 兜底重写所有内部跳转 Location。
 - **证书自动续期**：crontab 每日 3:30 `certbot renew --deploy-hook 'nginx reload'`。
 
 ### 历史：曾因该 bug 挂维护页（已废弃，下文为排查记录）
